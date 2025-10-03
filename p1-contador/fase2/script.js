@@ -8,13 +8,11 @@ const inputArchivo = document.getElementById("input-archivo");
 const tpl = document.getElementById("tpl-persona");
 const btnTema = document.getElementById("btn-tema");
 
+// --------- Botón de tema con retraso ---------
 btnTema.addEventListener("click", () => {
-  document.body.classList.toggle("dark-mode");
-
-  const modo = document.body.classList.contains("dark-mode")
-    ? "oscuro"
-    : "claro";
-  setEstado(`Modo ${modo} activado.`);
+  setTimeout(() => {
+    document.body.classList.toggle("dark-mode");
+  }, 500); // 500 ms = medio segundo
 });
 
 // --------- Utilidades ---------
@@ -64,7 +62,6 @@ async function cargarNombresDesdeTxt(url = "nombres.txt") {
   if (!res.ok) throw new Error(`No se pudo leer ${url}`);
   const text = await res.text();
 
-  // Permite .txt (una por línea) o .json (array de strings)
   let nombres;
   if (url.endsWith(".json")) {
     const arr = JSON.parse(text);
@@ -78,7 +75,6 @@ async function cargarNombresDesdeTxt(url = "nombres.txt") {
 
   if (nombres.length === 0) throw new Error("El archivo no contiene nombres.");
 
-  // Inicializa estado si no existían
   for (const n of nombres) {
     if (!estado.has(n)) estado.set(n, 10);
   }
@@ -86,7 +82,7 @@ async function cargarNombresDesdeTxt(url = "nombres.txt") {
   setEstado(`Cargados ${nombres.length} nombres.`);
 }
 
-// Carga desde archivo local (input file)
+// Carga desde archivo local
 async function cargarDesdeArchivoLocal(file) {
   const text = await file.text();
   let nombres;
@@ -110,7 +106,6 @@ async function cargarDesdeArchivoLocal(file) {
 }
 
 // --------- Interacción ---------
-// Delegación: un solo listener para todos los botones
 lista.addEventListener("click", (ev) => {
   const btn = ev.target.closest("button");
   if (!btn) return;
@@ -161,8 +156,6 @@ inputArchivo.addEventListener("change", async (e) => {
 });
 
 // --------- Bootstrap ---------
-// Opción A (recomendada en local con live server): intenta cargar nombres.txt
-// Opción B: si falla, el usuario puede usar “Cargar archivo local”
 cargarNombresDesdeTxt("nombres.txt").catch(() => {
   setEstado(
     "Consejo: coloca un nombres.txt junto a esta página o usa 'Cargar archivo local'."
